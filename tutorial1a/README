@@ -1,0 +1,11 @@
+# To compile:
+make 
+
+# To clean
+make clean
+
+Possible commands:
+
+./hello-world
+./international-hello-world
+./fancy-hello-world

@@ -35,7 +35,7 @@ int parse_url(char* url, url_info *info);
 #define PARSE_URL_PROTOCOL_UNKNOWN 3
 
 // parse_url associated error strings
-// static const char *parse_url_errstr[] = { "no error" , "no trailing slash", "invalid port", "unknown protocol"};
+static const char *parse_url_errstr[] = { "no error" , "no trailing slash", "invalid port", "unknown protocol"};
 
 void print_url_info(url_info *info);
 

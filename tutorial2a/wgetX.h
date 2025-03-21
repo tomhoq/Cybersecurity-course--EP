@@ -55,4 +55,7 @@ char* http_get_request(url_info *info);
  */
 char *read_http_reply(struct http_reply *reply);
 
+int empty_line(char *buff);
+int has_location(char * buff);
+
 #endif /* WGETX_H_ */

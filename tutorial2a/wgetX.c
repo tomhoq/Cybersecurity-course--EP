@@ -77,7 +77,7 @@ int main(int argc, char* argv[]) {
         return 4;
     } 
     int redirs = 0;
-    while (has_location(response)) {
+    if (has_location(response)) {
         ret = parse_url(response + 10, &info);
         if (ret) {
             fprintf(stderr, "Could not parse URL '%s': %s\n", url, parse_url_errstr[ret]);
@@ -97,7 +97,7 @@ int main(int argc, char* argv[]) {
                 fprintf(stderr, "Too many redirections\n");
                 return 5;
             }
-            continue;
+            //continue;
         }
         write_data(file_name, response, reply.reply_buffer + reply.reply_buffer_length - response);
     }
@@ -126,27 +126,28 @@ int download_page(url_info *info, http_reply *reply) {
      *     Use getaddrinfo and implement a function that works for both IPv4 and IPv6.
      *
      */
-    struct addrinfo hints, *res;
+    struct addrinfo hints, *res, *p;
     int fd, t;
  
     memset(&hints, 0, sizeof hints);
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
- 
-    t = getaddrinfo(info->host, "80", &hints, &res);
+    char port_str[7];
+    snprintf(port_str, sizeof(port_str), "%d", info->port); 
+    t = getaddrinfo(info->host, port_str, &hints, &res);
     if (t != 0) {
-        printf("Error getting address info.\n");
+        printf("Error getting address info: %s\n", gai_strerror(t));
         return -1;
-    }
-    fd = socket(AF_INET, SOCK_STREAM, 0);
-    if(fd == -1){
-        printf("Error creating socket.\n");
-        return -1;
-    }
-    if (connect(fd, res->ai_addr, res->ai_addrlen)) {
-        printf("Error connecting to server.\n");
-        freeaddrinfo(res);
-        return -1;
+    }   
+    for (p = res; p != NULL; p = p->ai_next) {
+        fd = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
+        if (fd == -1) continue;  // Try next address if socket creation fails
+
+        if (connect(fd, p->ai_addr, p->ai_addrlen) == 0) {
+            break;  // Successfully connected
+        }
+
+        close(fd);  // Close the failed socket
     }
     freeaddrinfo(res);
 
@@ -167,8 +168,10 @@ int download_page(url_info *info, http_reply *reply) {
      */
 
 
-     char *request = http_get_request(info);
-     if (write(fd, request, strlen(request)) == -1) {
+    char *request = http_get_request(info);
+     
+   printf("%s\n", request);    
+    if (write(fd, request, strlen(request)) == -1) {
          close(fd);
          free(request);
          return -1;
@@ -252,9 +255,15 @@ void write_data(const char *path, const char * data, int len) {
 }
 
 char* http_get_request(url_info *info) {
-    char * request_buffer = (char *) malloc(100 + strlen(info->path) + strlen(info->host));
-    snprintf(request_buffer, 1024, "GET /%s HTTP/1.1\r\nHost: %s\r\nConnection: close\r\n\r\n",
-	    info->path, info->host);
+    
+    char port_str[10] = "";
+    if (info->port != 80) {
+        snprintf(port_str, sizeof(port_str), ":%d", info->port);
+    }
+
+    char * request_buffer = (char *) malloc(100 + strlen(info->path) + strlen(info->host) + strlen(port_str));
+    snprintf(request_buffer, 1024, "GET /%s HTTP/1.1\r\nHost: %s%s\r\nConnection: close\r\n\r\n",
+	    info->path, info->host, port_str);
     return request_buffer;
 }
 
@@ -302,19 +311,22 @@ char *read_http_reply(struct http_reply *reply) {
     
     char *buf = status_line + 2;
 
+    printf("%d\n", status);
+
     if (status != 200 && status != 301) {
 	fprintf(stderr, "Server returned status %d (should be 200)\n", status);
 	return NULL;
     } else if (status == 301 || status == 302) {
         //find the line with the new location
-        while ((status_line = next_line(buf, reply->reply_buffer_length - (buf - reply->reply_buffer))) != NULL)
-        {
+         while ((status_line = next_line(buf, reply->reply_buffer_length - (buf - reply->reply_buffer))) != NULL)
+         {
             if (has_location(buf)) {
                 *status_line = '\0';
                 return buf;
             }
             buf = status_line + 2;        
         }
+        return 0;
     }
 
     /*

@@ -41,58 +41,59 @@
 	 puts("=========================");
 	 puts("");
  //
- //	//step 2: print idserver
- 	puts("=========STEP 2===========");
- 	puts("--results of print_idserver--");
- 	print_idserver(cmok);
- 	puts("=========================");
- 	puts("");
- 
- 
- 	//step 3: modification
- 	puts("=========STEP 3===========");
- 	modify(cmok, "cmok", 13000, "unknown");
- 
- 	puts("--results of modify--");
- 	print_idserver(cmok);
- 
- 	modify_by_pointer(&cmok,"cmok", 13000, "unknown");
- 	puts("--results of modify_by_pointer--");
- 	print_idserver(cmok);
- 	puts("=========================");
- 	puts("");
- 
- //	//step 4: pointers
- 	puts("=========STEP 4===========");
- 	idserver albi;
- 	idserver *s2;
- 
- 	albi = cmok;
- 	s2 = &albi;
- 
- 	modify_by_pointer(s2, "albi", 9000, "down");
- 	puts("--*s2--");
- 	print_idserver(*s2);
- 	puts("--albi--");
- 	print_idserver(albi);
- 	puts("--cmok--");
- 	print_idserver(cmok);
- 	puts("=========================");
- 	puts("");
+	//step 2: print idserver
+	puts("=========STEP 2===========");
+	puts("--results of print_idserver--");
+	print_idserver(cmok);
+	puts("=========================");
+	puts("");
  //
  //
- //	//step 5: create idservers
- 	puts("=========STEP 5===========");
- 	int nthreads = 20;
- 
- 	idserver *s3 = create_idserver("thorn", "afr", 5200, "up", &nthreads);
- 	puts("--results of creating ted, printed outside--");
- 	print_idserver(*s3);
- 	puts("=========================");
- 	puts("");
+	//step 3: modification
+	puts("=========STEP 3===========");
+	modify(cmok, "cmok", 13000, "unknown");
+ //
+	puts("--results of modify--");
+	print_idserver(cmok);
+ //
+	modify_by_pointer(&cmok,"cmok", 13000, "unknown");
+	puts("--results of modify_by_pointer--");
+	print_idserver(cmok);
+	puts("=========================");
+	puts("");
+ //
+	//step 4: pointers
+	puts("=========STEP 4===========");
+	idserver albi;
+	idserver *s2;
+ //
+	albi = cmok;
+	s2 = &albi;
+ //
+	modify_by_pointer(s2, "albi", 9000, "down");
+	puts("--*s2--");
+	print_idserver(*s2);
+	puts("--albi--");
+	print_idserver(albi);
+	puts("--cmok--");
+	print_idserver(cmok);
+	puts("=========================");
+	puts("");
+ //
+ //
+	//step 5: create idservers
+	puts("=========STEP 5===========");
+	int nthreads = 20;
+ //
+	idserver *s3 = create_idserver("thorn", "afr", 5200, "up", &nthreads);
+	puts("--results of creating ted, printed outside--");
+	print_idserver(*s3);
+	puts("=========================");
+	puts("");
  
  
 	 return EXIT_SUCCESS;
  }
+ 
  
  

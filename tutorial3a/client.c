@@ -30,7 +30,7 @@ void *listen_udp(void *arg) {
         buffer[strlen(buffer)] = '\0';   //replace \n with \0
 
         buffer[t] = '\0';
-        printf("%s", buffer);   
+        printf("Received:%s", buffer);   
     }
     return NULL;
 }
@@ -44,12 +44,14 @@ void *read_and_send(void *args) {
     //printf("%p\n", args);
 
     char str[100], buffer[100];
+    printf("Send:");
     while(fgets(str, sizeof str, stdin) != NULL) {  // reads newline too
         str[strlen(str)] = '\0';                              // truncate the array
         memset(buffer,0,sizeof(buffer)); 
         if ((sendto(sockfd, str, strlen(str), 0, (struct sockaddr *)server, sizeof(*server)))<0 ){
             perror("Failed to send\n");
         }
+        printf("Send:");
     }
     return NULL;
 }

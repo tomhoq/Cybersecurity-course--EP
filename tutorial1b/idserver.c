@@ -19,8 +19,8 @@ void print_idserver(idserver s)
 {
 	printf("Id: %s\n", s.id);
     printf("Latency (usec): %d\n", s.latency);
-    printf("Region %s\n", s.region);
-    printf("Status %s\n", s.status);
+    printf("Region: %s\n", s.region);
+    printf("Status: %s\n", s.status);
     printf("Nbr of threads: %d\n", *s.nthreads);
 }
 

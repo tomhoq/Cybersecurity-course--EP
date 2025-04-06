@@ -11,7 +11,8 @@
 #include<string.h>
 
 #include "header.h"
-
+struct sockaddr_in source, dest;
+FILE *logfile;
 
 void print_ethernet_header(const u_char *Buffer, int Size)
 {

@@ -228,8 +228,8 @@ struct pseudo_udp_header
  */
 unsigned short checksum(unsigned short *ptr, int nbytes);
 
-struct sockaddr_in source,dest;
-FILE *logfile;
+extern struct sockaddr_in source,dest;
+extern FILE *logfile;
 
 void process_ip_packet(const u_char * , int);
 void print_ip_packet(const u_char * , int);

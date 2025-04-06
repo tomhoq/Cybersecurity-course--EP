@@ -28,10 +28,8 @@ void print_ip_header(const u_char * Buffer, int Size)
 {
     print_ethernet_header(Buffer , Size);
 
-    unsigned short iphdrlen;
 
     struct iphdr *iph = (struct iphdr *)(Buffer  + sizeof(struct ethhdr) );
-    iphdrlen =iph->ihl*4;
 
     memset(&source, 0, sizeof(source));
     source.sin_addr.s_addr = iph->saddr;
@@ -59,6 +57,7 @@ void print_ip_header(const u_char * Buffer, int Size)
 void print_tcp_packet(const u_char * Buffer, int Size)
 {
     unsigned short iphdrlen;
+	unsigned short ethhdrlen = sizeof(struct ethhdr);
 
     struct iphdr *iph = (struct iphdr *)( Buffer  + sizeof(struct ethhdr) );
     iphdrlen = iph->ihl*4;
@@ -94,10 +93,10 @@ void print_tcp_packet(const u_char * Buffer, int Size)
     fprintf(logfile , "\n");
 
     fprintf(logfile , "IP Header\n");
-    PrintData(Buffer,iphdrlen);
+    PrintData(Buffer+ethhdrlen,iphdrlen);
 
     fprintf(logfile , "TCP Header\n");
-    PrintData(Buffer+iphdrlen,tcph->doff*4);
+    PrintData(Buffer+ethhdrlen+iphdrlen,tcph->doff*4);
 
     fprintf(logfile , "Data Payload\n");
     PrintData(Buffer + header_size , Size - header_size );
@@ -109,6 +108,7 @@ void print_udp_packet(const u_char *Buffer , int Size)
 {
 
     unsigned short iphdrlen;
+	unsigned short ethhdrlen = sizeof(struct ethhdr);
 
     struct iphdr *iph = (struct iphdr *)(Buffer +  sizeof(struct ethhdr));
     iphdrlen = iph->ihl*4;
@@ -129,10 +129,10 @@ void print_udp_packet(const u_char *Buffer , int Size)
 
     fprintf(logfile , "\n");
     fprintf(logfile , "IP Header\n");
-    PrintData(Buffer , iphdrlen);
+    PrintData(Buffer+ethhdrlen , iphdrlen);
 
     fprintf(logfile , "UDP Header\n");
-    PrintData(Buffer+iphdrlen , sizeof udph);
+    PrintData(Buffer+ethhdrlen+iphdrlen , sizeof udph);
 
     fprintf(logfile , "Data Payload\n");
 
@@ -145,6 +145,7 @@ void print_udp_packet(const u_char *Buffer , int Size)
 void print_icmp_packet(const u_char * Buffer , int Size)
 {
     unsigned short iphdrlen;
+	unsigned short ethhdrlen = sizeof(struct ethhdr);
 
     struct iphdr *iph = (struct iphdr *)(Buffer  + sizeof(struct ethhdr));
     iphdrlen = iph->ihl * 4;
@@ -178,10 +179,10 @@ void print_icmp_packet(const u_char * Buffer , int Size)
     fprintf(logfile , "\n");
 
     fprintf(logfile , "IP Header\n");
-    PrintData(Buffer,iphdrlen);
+    PrintData(Buffer+ethhdrlen,iphdrlen);
 
     fprintf(logfile , "UDP Header\n");
-    PrintData(Buffer + iphdrlen , sizeof icmph);
+    PrintData(Buffer+ethhdrlen + iphdrlen , sizeof icmph);
 
     fprintf(logfile , "Data Payload\n");
 

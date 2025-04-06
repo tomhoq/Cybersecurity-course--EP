@@ -118,6 +118,20 @@ int main(int argc, char *argv[])
 		printf("Unable to create file.");
 	}
 
+	struct bpf_program fp;
+	//dns
+	char filter_exp[100] = "port 53";
+	if (pcap_compile(handle, &fp, filter_exp, 0, net_ip) == -1)
+	{
+		fprintf(stderr, "Unable to compile the packet filter. %s\n", pcap_geterr(handle));
+		exit(1);
+	}
+
+	if (pcap_setfilter(handle, &fp) == -1)
+	{
+		fprintf(stderr, "Unable to set the packet filter. %s\n", pcap_geterr(handle));
+		exit(1);
+	}
 	//Put the device in sniff loop
 	pcap_loop(handle , -1 , process_packet , NULL);
 

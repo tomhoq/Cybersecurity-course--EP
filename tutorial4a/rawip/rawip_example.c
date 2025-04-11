@@ -18,7 +18,7 @@
 #define SRC_PORT 54321 //set the source port here. It can be a fake one
 
 #define DEST_IP "129.104.89.108" //set your destination ip here
-#define DEST_PORT 5555 //set the destination port here
+#define DEST_PORT 5432 //set the destination port here
 #define TEST_STRING "test data" //a test string as packet payload
 
 struct sockaddr_in source,dest;
@@ -60,17 +60,18 @@ int main(int argc, char *argv[])
 	//fill the IP header here
 	iph->ihl = 5;
 	iph->version = 4;
-	iph-> tos = 0;
+	iph->tos = 0;
 	iph->tot_len = sizeof(struct iphdr) + sizeof(struct udphdr) + strlen(data_string);
-	printf("tot_len: %d\n", iph->tot_len);
+	//printf("tot_len: %d\n", iph->tot_len);
 	iph->id = htons(54321); //Id of this packet
 	iph->frag_off = 0;
 	iph->ttl = 255; //Time to live
-	iph->protocol = 17; //UDP protocol
+	iph->protocol = IPPROTO_UDP; //UDP protocol
 	iph->saddr = inet_addr(source_ip); //Source IP address
 	iph->daddr = inet_addr(dest_ip); //Destination IP address
-	iph->check = checksum((unsigned short *)packet, sizeof(struct iphdr)); //IP checksum
-	printf("IP checksum: %x\n", iph->check);
+	iph->check = 0;
+    iph->check = checksum((unsigned short *)packet, sizeof(struct iphdr)); //IP checksum
+	//printf("IP checksum: %x\n", iph->check);
 	//fill the UDP header
 	psh.source_address = inet_addr(source_ip); //Source IP
 	psh.dest_address = inet_addr(dest_ip); //Destination IP
@@ -83,9 +84,9 @@ int main(int argc, char *argv[])
 	udph->len = htons(sizeof(struct udphdr) + strlen(data_string)); //UDP length
 	memcpy(pseudo, (char *)&psh, sizeof(struct pseudo_udp_header)); //pseudo header
 	memcpy(pseudo + sizeof(struct pseudo_udp_header), udph, sizeof(struct udphdr) + strlen(data_string)); //UDP header + data
-
+    udph->check = 0;
 	udph->check = checksum((unsigned short *)pseudo, sizeof(struct pseudo_udp_header) + sizeof(struct udphdr) + strlen(data_string)); //UDP checksum
-	printf("UDP checksum: %x\n", udph->check);
+	//printf("UDP checksum: %x\n", udph->check);
 	//send the packet
 	dest.sin_family = AF_INET; //IPv4
 	dest.sin_port = htons(DEST_PORT); //Destination port

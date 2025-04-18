@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
 	//	   get all packets your device sees, whether they are intendeed for you or
 	//	   not!! Be sure you know the rules of the network you are running on
 	//	   before you set your card in promiscuous mode!!
-	handle = pcap_open_live(dev_name, BUF_SIZE, 1, 0, err_buf);
+	handle = pcap_open_live(dev_name, BUF_SIZE, 1, 100, err_buf);
 
 	if(handle == NULL)
 	{

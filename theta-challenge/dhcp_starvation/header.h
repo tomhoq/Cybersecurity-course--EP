@@ -139,7 +139,7 @@ struct iphdr
 
 #define ETH_ALEN	6		/* Octets in one ethernet addr	 */
 
-struct ethhdr {
+struct ethhdr_1 {
 	unsigned char	h_dest[ETH_ALEN];	/* destination eth addr	*/
 	unsigned char	h_source[ETH_ALEN];	/* source ether addr	*/
 	unsigned short	h_proto;		/* packet type ID field	*/
@@ -223,6 +223,78 @@ struct pseudo_udp_header
     u_int16_t udp_length;
 };
 
+struct dhcphdr {
+  /** Operation https://dox.ipxe.org/include_2ipxe_2dhcp_8h_source.html#l00613
+   *
+   * This must be either @c BOOTP_REQUEST or @c BOOTP_REPLY.
+   */
+  uint8_t op;
+  /** Hardware address type
+   *
+   * This is an ARPHRD_XXX constant.  Note that ARPHRD_XXX
+   * constants are nominally 16 bits wide; this could be
+   * considered to be a bug in the BOOTP/DHCP specification.
+   */
+  uint8_t htype;
+  /** Hardware address length */
+  uint8_t hlen;
+  /** Number of hops from server */
+  uint8_t hops;
+  /** Transaction ID */
+  uint32_t xid;
+  /** Seconds since start of acquisition */
+  uint16_t secs;
+  /** Flags */
+  uint16_t flags;
+  /** "Client" IP address
+   *
+   * This is filled in if the client already has an IP address
+   * assigned and can respond to ARP requests.
+   */
+  u_int32_t ciaddr;
+  /** "Your" IP address
+   *
+   * This is the IP address assigned by the server to the client.
+   */
+  u_int32_t yiaddr;
+  /** "Server" IP address
+   *
+   * This is the IP address of the next server to be used in the
+   * boot process.
+   */
+   u_int32_t siaddr;
+  /** "Gateway" IP address
+   *
+   * This is the IP address of the DHCP relay agent, if any.
+   */
+   u_int32_t giaddr;
+   
+  /** Client hardware address */
+  uint8_t chaddr[16];
+  /** Server host name (null terminated)
+   *
+   * This field may be overridden and contain DHCP options
+   */
+  char sname[64];
+  /** Boot file name (null terminated)
+   *
+   * This field may be overridden and contain DHCP options
+   */
+  char file[128];
+  /** DHCP magic cookie
+   *
+   * Must have the value @c DHCP_MAGIC_COOKIE.
+   */
+  uint32_t magic;
+  /** DHCP options
+   *
+   * Variable length; extends to the end of the packet.  Minimum
+   * length (for the sake of sanity) is 1, to allow for a single
+   * @c DHCP_END tag.
+   */
+  uint8_t options[0];
+};
+ 
 /*
  * checksum calculation
  */
@@ -233,9 +305,13 @@ extern FILE *logfile;
 
 void process_ip_packet(const u_char * , int);
 void print_ip_header(const u_char * , int);
+void print_dhcp_header(const u_char * , int);
 void print_tcp_packet(const u_char *  , int );
 void print_udp_packet(const u_char * , int);
 void print_icmp_packet(const u_char * , int );
 void PrintData (const u_char * , int);
+void generate_random_xid(uint32_t *);
+void generate_random_mac(uint8_t *);
+
 
 #endif /* HEADER_H_ */

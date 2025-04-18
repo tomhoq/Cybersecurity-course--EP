@@ -1,0 +1,7 @@
+The parse function is concatenating a 256 buffer to a 128 array using strcat which is considered unsafe.
+
+The stack can be overwrited or even worse replacing the return address to malicious code chosen by the attacker.
+This is called Return oriented Programming and uses buffer overflows.
+
+Instead because we know the code is using the system command with the variable command which is stored in the stack
+of the function we can try to overflow enough bytes to replce the command with something else that allows us to modify the html file used by port 80

@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
 	iph->version = 4;
 	iph->tos = 0;
 	iph->tot_len = sizeof(struct iphdr) + sizeof(struct udphdr) + strlen(data_string);
-	//printf("tot_len: %d\n", iph->tot_len);
+	printf("tot_len: %d\n", iph->tot_len);
 	iph->id = htons(54321); //Id of this packet
 	iph->frag_off = 0;
 	iph->ttl = 255; //Time to live
@@ -71,7 +71,10 @@ int main(int argc, char *argv[])
 	iph->daddr = inet_addr(dest_ip); //Destination IP address
 	iph->check = 0;
     iph->check = checksum((unsigned short *)packet, sizeof(struct iphdr)); //IP checksum
-	//printf("IP checksum: %x\n", iph->check);
+    
+    //print_ip_header(packet, iph->tot_len); //print the packet
+
+    //printf("IP checksum: %x\n", iph->check);
 	//fill the UDP header
 	psh.source_address = inet_addr(source_ip); //Source IP
 	psh.dest_address = inet_addr(dest_ip); //Destination IP

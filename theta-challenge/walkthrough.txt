@@ -1,0 +1,21 @@
+Log:
+- start a nginx server that uses index.html on vm
+- created a dns server with dnsmasq that maps facebook to the vms ip
+- set resolve.conf file dns to my vm
+- try dig facebook.com and it works correctly
+- try curl and it is still going to the real facebook
+- check with tcpdump and it is indeed still goin g over the real dns
+- find out about /etc/nsswitch.conf which sets the order of lookup
+- specifically dns which uses resolv.conf was the last in line which meant every other method was being used before
+- resolved which uses the systemd-resolved service was being used and the reason why curl and normal get request
+were failing
+- so I set the ip of dns in systemd resolved by doing resolved interface (wlp1s0 in this case) ip (of the vm)
+- curl was now working but not get requests in firefox using http
+- apparently firefox switches automatically from http to https for known pages like facebook
+- lets try to setup a https instead with caddy 
+- its not possible because there needs to be a dns entry
+
+-------DHCP STARVATION--------------------
+- found this tool called yersinia
+- only GUI version has dhcp attacks so I will try on the host
+- yersinia seems to have a bug with the GUI so I will try running it locally

@@ -8,13 +8,13 @@
 
 # Here is a simple Make Macro.
 
-LINK_TARGET = pcap_example 
+LINK_TARGET = dhcp
 
 # Here is a Make Macro that uses the backslash to extend to multiple lines.
 # This allows quick modification of more object files.
 
 OBJS = \
-	pcap_example.o header.o
+	dhcp.o header.o
 	
 # Here is a Make Macro defined by two Macro Expansions.
 # A Macro Expansion may be treated as a textual replacement of the Make Macro.
@@ -52,10 +52,9 @@ clean:
 # Here is a Rule that uses some built-in Make Macros in its command:
 # $@ expands to the rule's target
 # $^ expands to the rule's dependencies
-#$(LINK_TARGET) : $(OBJS)
-pcap_example : pcap_example.o header.o
-	gcc -g3  -o  $@ $^ -lpcap
-	
+$(LINK_TARGET) : $(OBJS)
+
+
 # Here is a Pattern Rule, often used for compile-line.
 # It says how to create a file with a .o suffix, given a file with a .c suffix.
 # The rule's command uses some built-in Make Macros:

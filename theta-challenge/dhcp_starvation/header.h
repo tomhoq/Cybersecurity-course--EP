@@ -305,6 +305,7 @@ extern FILE *logfile;
 
 void process_ip_packet(const u_char * , int);
 void print_ip_header(const u_char * , int);
+void print_ethernet_header(const u_char * , int);
 void print_dhcp_header(const u_char * , int);
 void print_tcp_packet(const u_char *  , int );
 void print_udp_packet(const u_char * , int);

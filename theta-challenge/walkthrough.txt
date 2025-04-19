@@ -19,3 +19,9 @@ were failing
 - found this tool called yersinia
 - only GUI version has dhcp attacks so I will try on the host
 - yersinia seems to have a bug with the GUI so I will try running it locally
+- we ar emant to code the starvation ourselves
+- so i created code to send discovery packets but they do not receive an offer maybe becasue the mac differs form the one the interface uses
+
+
+- another student gave me a tip to set up a dhcp server and try to communicate with it instead
+- so i created a dhcp server with isc-dhcp-server with 252 ips for lease  (corresponding to the docker network ips 172.17.0.3-255) and ran with dhcp -f -d to run in the foreground and also output to stdout

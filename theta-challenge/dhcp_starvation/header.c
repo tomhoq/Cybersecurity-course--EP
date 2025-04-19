@@ -29,7 +29,7 @@ void print_ethernet_header(const u_char *Buffer, int Size)
     printf("\n");
     printf("Ethernet Header\n");
     printf("   |-Destination Address : %.2X-%.2X-%.2X-%.2X-%.2X-%.2X \n", eth->h_dest[0] , eth->h_dest[1] , eth->h_dest[2] , eth->h_dest[3] , eth->h_dest[4] , eth->h_dest[5] );
-    //printf("   |-Source Address      : %.2X-%.2X-%.2X-%.2X-%.2X-%.2X \n", eth->h_source[0] , eth->h_source[1] , eth->h_source[2] , eth->h_source[3] , eth->h_source[4] , eth->h_source[5] );
+    printf("   |-Source Address      : %.2X-%.2X-%.2X-%.2X-%.2X-%.2X \n", eth->h_source[0] , eth->h_source[1] , eth->h_source[2] , eth->h_source[3] , eth->h_source[4] , eth->h_source[5] );
     printf("   |-Protocol            : %u \n",(unsigned short)eth->h_proto);
 }
 
@@ -88,6 +88,9 @@ void generate_random_mac(uint8_t *mac) {
         close(fd);
         exit(EXIT_FAILURE);
     }
+
+    //set the multicast bit stinn doesnt work
+    //mac[0] = (mac[0] & 0xFE) | 0x02; 
     printf("Generated random MAC: %02X:%02X:%02X:%02X:%02X:%02X\n",
            mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
     close(fd);
@@ -233,7 +236,9 @@ void print_icmp_packet(const u_char * Buffer , int Size)
 
 void print_dhcp_header (const u_char * Buffer , int Size)
 {
-    struct dhcphdr *dhcp = (struct dhcphdr *)(Buffer  + sizeof(struct iphdr) + sizeof(struct udphdr));
+    struct dhcphdr *dhcp = (struct dhcphdr *)(Buffer);
+
+    printf("\n");
     unsigned char *options = (unsigned char *)dhcp->options;
     printf("\n\n***********************DHCP Packet*************************\n");
     printf("DHCP Header\n");

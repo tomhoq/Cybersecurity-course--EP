@@ -8,13 +8,13 @@
 
 # Here is a simple Make Macro.
 
-LINK_TARGET = send-offer
+LINK_TARGET = server
 
 # Here is a Make Macro that uses the backslash to extend to multiple lines.
 # This allows quick modification of more object files.
 
 OBJS = \
-	send-offer.o header.o
+	server.o header.o
 	
 # Here is a Make Macro defined by two Macro Expansions.
 # A Macro Expansion may be treated as a textual replacement of the Make Macro.

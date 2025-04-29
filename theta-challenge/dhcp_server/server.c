@@ -22,15 +22,17 @@
 #define DHCP_CLIENT_PORT 68
 #define DEST_IP "255.255.255.255"
 #define DHCP_SERVER_PORT 67
-#define IP_TO_OFFER "192.168.103.100" // change 
-#define ROUTER_IP "192.168.103.1" //Change
-int DNS_IP[4] = {8, 8, 8, 8}; // change
+#define IP_TO_OFFER "10.30.103.100" // change 
+#define ROUTER_IP "10.30.5.1" //Change
+#define LEASE_TIME 3600 // 1 hour
+int BROADCAST_IP[4] = {10, 30, 15, 255}; // change
+int DNS_IP[4] = {192, 168, 1, 1}; // change
 int SUBNET_MASK[4] = {255, 255, 255, 0}; // change
 
 uint32_t xid;
 uint8_t mac[6];
 
-int dhcp_listen(int sockfd, int type);
+int dhcp_listen(int sockd, int type);
 int dhcp_send_offer();
 int dhcp_ack();
 
@@ -274,7 +276,7 @@ int dhcp_send_offer() {
 
     dhcp->options[index++] = 51; // IP address lease time
     dhcp->options[index++] = 4;
-    uint32_t lease_time = htonl(3600);
+    uint32_t lease_time = htonl(LEASE_TIME);
     memcpy(&dhcp->options[index], &lease_time, 4);
     index += 4;
 
@@ -359,11 +361,10 @@ int dhcp_ack() {
     dhcp->hops = 0;
     dhcp->xid = htonl(xid); 
     dhcp->secs = 0;
-    dhcp->flags = htons(0x8000); 
+    dhcp->flags = 0; 
     dhcp->ciaddr = 0; 
     inet_pton(AF_INET, IP_TO_OFFER, &dhcp->yiaddr);
-
-    inet_pton(AF_INET, server_ip_str, &dhcp->siaddr); 
+    dhcp->siaddr = 0;
     dhcp->giaddr = 0; 
 
     memcpy(dhcp->chaddr, mac, 6);
@@ -387,7 +388,7 @@ int dhcp_ack() {
     // Lease Time (1 hour in seconds)
     dhcp->options[index++] = 51; // IP Address Lease Time
     dhcp->options[index++] = 4;
-    uint32_t lease_time = htonl(3600); // 1 hour lease time
+    uint32_t lease_time = htonl(LEASE_TIME); // 1 hour lease time
     memcpy(&dhcp->options[index], &lease_time, 4);
     index += 4;
 
@@ -405,6 +406,7 @@ int dhcp_ack() {
     dhcp->options[index++] = 3; // Router
     dhcp->options[index++] = 4;
     memcpy(&dhcp->options[index], router_ip, 4);
+    index += 4;
 
     // DNS Servers
     dhcp->options[index++] = 6; // DNS
@@ -413,6 +415,14 @@ int dhcp_ack() {
     dhcp->options[index++] = DNS_IP[1];
     dhcp->options[index++] = DNS_IP[2];
     dhcp->options[index++] = DNS_IP[3];
+
+    // Broadcast address
+    dhcp->options[index++] = 28; // Broadcast address
+    dhcp->options[index++] = 4;
+    dhcp->options[index++] = BROADCAST_IP[0];
+    dhcp->options[index++] = BROADCAST_IP[1];
+    dhcp->options[index++] = BROADCAST_IP[2];
+    dhcp->options[index++] = BROADCAST_IP[3];
 
     // End option
     dhcp->options[index++] = 255;

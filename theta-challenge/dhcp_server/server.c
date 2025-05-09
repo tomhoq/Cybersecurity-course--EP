@@ -102,6 +102,8 @@ int main(int argc, char *argv[]) {
 
 
     if (dhcp_ack()) return -1;
+    if (dhcp_ack()) return -1;
+
 
     close(fd);
     return 0;
@@ -118,7 +120,7 @@ int dhcp_listen(int sockfd, int type) {
     struct dhcphdr *dhcp;
 
     while (1) {
-        //printf("Waiting for DHCPOFFER...\n");
+        printf("Waiting for DHCPOFFER...\n");
         memset(frame, 0, sizeof(frame));
         int len = recvfrom(sockfd, frame, sizeof(frame), 0, (struct sockaddr *)&sender, &sender_len);
         if (len < 0) {

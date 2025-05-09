@@ -186,12 +186,12 @@ int dhcp_receive(int sockfd, struct sockaddr_in *server_addr, uint32_t *yiaddr, 
         int eight = 0;
         //printf("DHCP bytes at offset:\n");
         /*for (int i = 0; i < len; i++) {
-            printf("%02X ", raw_dhcp[i]);
+            //printf("%02X ", raw_dhcp[i]);
             eight++;
             if (eight == 8) {
-                printf("  ");
+                //printf("  ");
             } else if (eight == 16) {
-                printf("\n");
+                //printf("\n");
                 eight = 0;
             }
         }*/
@@ -221,19 +221,19 @@ int dhcp_receive(int sockfd, struct sockaddr_in *server_addr, uint32_t *yiaddr, 
             //printf("%d vs %d\n", ntohs(udph->dest), SRC_PORT);
             continue;
         }; 
-        //printf("Received packet from %s\n", inet_ntoa(*(struct in_addr *)&iph->saddr));
+        printf("Received packet from %s\n", inet_ntoa(*(struct in_addr *)&iph->saddr));
         dhcp = (struct dhcphdr *)(frame + sizeof(struct ethhdr_1) + iph->ihl * 4 + sizeof(struct udphdr));
         //print_dhcp_header(frame+sizeof(struct ethhdr_1) + iph->ihl * 4 + sizeof(struct udphdr), len);
         if (dhcp->op != 2 || ntohl(dhcp->xid) != expected_xid) {
-            //printf("Not a DHCPOFFER or transaction ID mismatch\n");
+            printf("Not a DHCPOFFER or transaction ID mismatch\n");
             //print xid in hex
             //print_dhcp_header(frame + sizeof(struct ethhdr_1) + iph->ihl * 4 + sizeof(struct udphdr), len);
-            //printf("Transaction ID mismatch: expected 0x%x, received 0x%x\n", expected_xid, ntohl(dhcp->xid));
+            printf("Transaction ID mismatch: expected 0x%x, received 0x%x\n", expected_xid, ntohl(dhcp->xid));
 
             //printf("MAC: %02X:%02X:%02X:%02X:%02X:%02X\n",
                 //   dhcp->chaddr[0], dhcp->chaddr[1], dhcp->chaddr[2],
                 //   dhcp->chaddr[3], dhcp->chaddr[4], dhcp->chaddr[5]);
-            //printf("XID: 0x%x\n", dhcp->xid);
+            printf("XID: 0x%x\n", dhcp->xid);
 
             continue; // not an offer
         }

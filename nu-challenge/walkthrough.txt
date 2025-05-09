@@ -1,0 +1,86 @@
+The memory position of the buffers used to receive input is being leaked and printed. 
+Although this challenge doesn't make use of a system command it still allows for buffer overflows. 
+Knowing the exact position in memory of the arrays we can also probably calculate the exact position of the return address and overwrite it to insert my own code.
+
+Higher memory addresses (closer to 0x7fffffffffff)
+
+| Return Address (8 Bytes)
+| Saved Frame Pointer (8 Bytes) -> 0x7fffffffe777
+| greeting_text[127] -> (128) 0x7fffffffe76f
+| ... greeting_text[i] ...
+| greeting_text[0] -> 0x7fffffffe6f0
+| buf[255] -> (256) 0x7fffffffe6ef
+| ... buf[i] ...
+| buf[0] -> 0x7fffffffe5f0
+
+Lower memory addresses
+
+
+So if we write 128 + 8 + 8 bytes we will overwrite the return address. Specifically we could in those last 8 bytes write 0x7fffffffe5f0 0x0 which is the address of buffer and then put shell code at the start of said buffer to be executed.
+
+Because greeting text already has 12 bytes in we only need to write 116 + 8 + 8 bytes.
+
+Apparently this did not work I am not sure why but there was more space in between.
+
+So instead I started by trying to get shellcode to run in my machine. 
+It was surprisingly difficult as I always got Segfaults. I tried writing my own
+assembly code which it worked when running with nasm but not when using c.
+
+Eventually I looked up some already written shellcodes and managed to get it to work locally.
+
+Then I created a buffer  with  144 Bytes with the shell code at the start and the address to the shell code in the end.
+
+The idea was to overwrite the return address with the address of my code. The 144 Bytes didnt work
+so instead I wrote attack.c to experimentally try different locations.
+
+Knowing for sure the return address hadto be after greeting text in memory we 
+can constrain the search space to greeting_text[128] to greeting_text[128+50].
+
+And if this doesnt work increase the search space. 
+
+At first it was not working. It was very frustrating because with this attack 
+there is no answer from the server/ it's hard to know what's wrong. After some local 
+experiments I found out it was very important to put the \n after the command 
+to run otherwise bin/sh thinks I am still writing.
+
+Finally I got it to work and found out the distance between greeting text and
+return address was of 24 Bytes (counting the "hello " string ). 
+
+I then hardcoded this distance in attack2.c to allow for easier remote code execution.
+
+###########################################
+
+STACK PROTECTION
+
+Canaries can be used to prevent the previous attack. A canary word is a bunch of bytes stored together between the data part and the return adress in the stack. When a buffer overflows it will write to the canary which will become corrupt and alert the program.
+
+3 types of canaries:
+Terminator -> a canary composed of null terminators. This makes strcpy less vulnerable as it will return on null terminator making it harder to write on the ret address. Still if an attacker manages to guess the canary it might be able to  overflow using other methods
+
+Random -> random bytes are generated which makes it harder to guess. The bytes are loaded in a different part of memory making it difficult to find.
+
+Random XOR -> the canary is produced by xoring random bytes with control data (ret address). This way the attacker can read  the produced canary but it needs also the control data and the random bytes to achieve the same XOR value.
+
+ASLR (address space layout randomization)
+Randomizes the address space used by the heap and stack making it harder to predict specific addresses 
+
+PIE (position independent executable)
+every time the executable is run it gets loaded into a different memory address preventing hardcoded function addresses. However the offset used to change the position is constant for every part of the binary meaning if one discovers the offset for the main function they can discover all the other addresses
+
+NX bit (non executable)
+It is a processor feature to declare memory pages as either instructions or data by deciding they are either writeable or executable but not both. However there are some ways to go around:
+By default the OS gives a NX value. If it's simple variable declarations than the stack of the function will be set as Non executable. However if there is a nested function the OS will remove the NX protection.
+
+If however the bit is set although one cant enter our own code anymore into the stack as it wont execute we can still overwrite the return address to an already existing function's address. For example the system function. Then after it we also write an address to execute once system finishes which can be the address of the exit function and and then the arguments for system call: /bin/sh to create a shell.
+
+--------------------------------------------
+Challenge
+
+The address of the stack is given in the original code. If I replace the printf("%p"...) line with: 
+scanf("%s", name); 
+printf(name);
+
+how can we recover the address of the stack, and thus potentially bypass ASLR, canary and PIE?
+
+
+printf(name) is vulnerable to crafted inputs like %p %p which will pop something from the stack and show its location.

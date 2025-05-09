@@ -35,7 +35,7 @@ int parse(int sockfd)
 int main(int argc, char** argv)
 {
   int connfd=0;
-      parse(connfd);
+  parse(connfd);
 	return 0;
 
 }
